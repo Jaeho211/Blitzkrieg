@@ -341,6 +341,7 @@ export function App() {
         const sequence = event.sequence;
         const isMouzaive = event.id === 'mouzaive';
         const isGhostTanks = event.id === 'ghost-tanks';
+        const isDenseTextEvent = event.id === 'bulson';
         const hasVideo = Boolean(event.youtubeId);
         const isMapEvent = event.imageTone === 'map';
         const imageGridColumns = hasVideo
@@ -409,20 +410,40 @@ export function App() {
                     {event.time ? <span className="ml-4 text-paper/70">{event.time}</span> : null}
                   </div>
                 )}
-                <h3 className={`${event.showDate === false ? 'mt-0' : 'mt-5'} text-3xl font-black leading-tight text-white sm:text-5xl`}>{event.title}</h3>
-                <p className={`mt-6 leading-8 text-paper/82 ${sequence || event.analysisBlocks ? 'text-2xl font-semibold' : 'text-xl'}`}>{event.summary}</p>
+                <h3
+                  className={`${event.showDate === false ? 'mt-0' : 'mt-5'} font-black leading-tight text-white ${
+                    isDenseTextEvent ? 'text-3xl sm:text-4xl' : 'text-3xl sm:text-5xl'
+                  }`}
+                >
+                  {event.title}
+                </h3>
+                <p
+                  className={`mt-6 text-paper/82 ${
+                    isDenseTextEvent
+                      ? 'text-lg font-semibold leading-7 xl:text-xl xl:leading-8'
+                      : sequence || event.analysisBlocks
+                        ? 'text-2xl font-semibold leading-8'
+                        : 'text-xl leading-8'
+                  }`}
+                >
+                  {event.summary}
+                </p>
                 {sequence ? (
                   <div className="mt-7 border border-paper/12 bg-paper/[0.035] p-4 sm:p-5 xl:p-6">
-                    <ol className="space-y-3">
+                    <ol className={isDenseTextEvent ? 'space-y-2.5' : 'space-y-3'}>
                       {sequence.map((item, itemIndex) => {
                         const isTurningPoint = item.side === 'turning-point';
                         return (
                           <li key={`${item.time}-${item.title}`} className="relative grid grid-cols-[4.1rem_1fr] gap-4 sm:grid-cols-[4.85rem_1fr]">
-                            <div className={`pt-4 text-right font-mono text-sm font-black sm:text-base ${isTurningPoint ? 'text-signal' : 'text-steel'}`}>
+                            <div
+                              className={`${isDenseTextEvent ? 'pt-3 text-xs sm:text-sm' : 'pt-4 text-sm sm:text-base'} text-right font-mono font-black ${
+                                isTurningPoint ? 'text-signal' : 'text-steel'
+                              }`}
+                            >
                               {item.time}
                             </div>
                             <div
-                              className={`relative border p-4 ${
+                              className={`relative border ${isDenseTextEvent ? 'p-3 xl:p-3.5' : 'p-4'} ${
                                 isTurningPoint
                                   ? 'border-signal/60 bg-signal/13'
                                   : itemIndex === sequence.length - 1
@@ -431,14 +452,20 @@ export function App() {
                               }`}
                             >
                               <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                                <h5 className="text-lg font-black leading-7 text-white xl:text-xl">{item.title}</h5>
+                                <h5 className={`${isDenseTextEvent ? 'text-base xl:text-lg' : 'text-lg xl:text-xl'} font-black leading-7 text-white`}>{item.title}</h5>
                                 {isTurningPoint ? (
                                   <span className="border border-signal/55 px-2 py-0.5 text-xs font-bold text-signal">
                                     {item.badge ?? '과대평가'}
                                   </span>
                                 ) : null}
                               </div>
-                              <p className="mt-2 text-base font-semibold leading-7 text-paper/76 xl:text-lg xl:leading-8">{item.body}</p>
+                              <p
+                                className={`mt-2 font-semibold text-paper/76 ${
+                                  isDenseTextEvent ? 'text-sm leading-6 xl:text-base xl:leading-7' : 'text-base leading-7 xl:text-lg xl:leading-8'
+                                }`}
+                              >
+                                {item.body}
+                              </p>
                             </div>
                           </li>
                         );
