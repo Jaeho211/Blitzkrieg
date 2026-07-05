@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  font-family: Inter, Pretendard, system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-snap-type: y mandatory;
+}
+
+body {
+  margin: 0;
+  background: #101111;
+}
+
+img {
+  display: block;
+}
+
+.snap-section {
+  min-height: 100svh;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.tactical-grid {
+  background-image:
+    linear-gradient(rgba(214, 200, 170, 0.13) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(214, 200, 170, 0.13) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+@media (max-width: 767px) {
+  html {
+    scroll-snap-type: y proximity;
+  }
+
+  .snap-section {
+    min-height: 100dvh;
+    scroll-snap-stop: normal;
+  }
+}
