@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   AlertTriangle,
@@ -28,6 +29,12 @@ import {
   timeline,
   type EventKind,
 } from './data/presentation';
+
+type PageNavItem = {
+  id: string;
+  page: number;
+  label: string;
+};
 
 const kindStyles: Record<EventKind, { label?: string; className: string }> = {
   success: { className: 'border-field/70 bg-field/15 text-paper' },
@@ -60,12 +67,14 @@ function SectionLabel({ icon: Icon, children }: { icon: LucideIcon; children: Re
 }
 
 function SnapSection({
+  id,
   children,
   className = '',
   pageNumber,
   totalPages,
   pageTone = 'dark',
 }: {
+  id?: string;
   children: React.ReactNode;
   className?: string;
   pageNumber?: number;
@@ -73,10 +82,10 @@ function SnapSection({
   pageTone?: 'dark' | 'light';
 }) {
   return (
-    <section className={`snap-section relative ${className}`}>
+    <section id={id} className={`snap-section relative ${className}`}>
       {pageNumber && totalPages ? (
         <div
-          className={`pointer-events-none absolute right-5 top-5 z-20 border px-2.5 py-1 font-mono text-[0.68rem] font-bold tracking-[0.16em] sm:right-8 lg:right-12 ${
+          className={`pointer-events-none absolute right-5 top-20 z-20 border px-2.5 py-1 font-mono text-[0.68rem] font-bold tracking-[0.16em] sm:right-8 lg:right-12 ${
             pageTone === 'light'
               ? 'border-coal/25 bg-white/45 text-coal/70'
               : 'border-paper/15 bg-coal/55 text-paper/62 backdrop-blur'
@@ -91,9 +100,99 @@ function SnapSection({
   );
 }
 
+function PageNav({ items, totalPages }: { items: PageNavItem[]; totalPages: number }) {
+  const [activeId, setActiveId] = useState(items[0]?.id ?? '');
+  const activeItem = items.find((item) => item.id === activeId) ?? items[0];
+
+  useEffect(() => {
+    if (items.length === 0) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const bestEntry = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+        if (bestEntry?.target.id) {
+          setActiveId(bestEntry.target.id);
+        }
+      },
+      {
+        root: null,
+        rootMargin: '-30% 0px -50% 0px',
+        threshold: [0.1, 0.35, 0.6],
+      },
+    );
+
+    items.forEach((item) => {
+      const section = document.getElementById(item.id);
+      if (section) {
+        observer.observe(section);
+      }
+    });
+
+    return () => observer.disconnect();
+  }, [items]);
+
+  useEffect(() => {
+    const button = document.getElementById(`page-nav-${activeId}`);
+    button?.scrollIntoView({ block: 'nearest', inline: 'center' });
+  }, [activeId]);
+
+  const jumpToSection = (item: PageNavItem) => {
+    setActiveId(item.id);
+    document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  if (!activeItem) {
+    return null;
+  }
+
+  return (
+    <nav
+      aria-label="페이지 이동"
+      className="fixed left-1/2 top-3 z-50 w-[min(calc(100vw-1rem),72rem)] -translate-x-1/2 border border-paper/14 bg-coal/82 px-2.5 py-2 shadow-2xl shadow-black/35 backdrop-blur-md sm:top-4 sm:px-3"
+    >
+      <div className="grid gap-2 md:grid-cols-[minmax(12rem,18rem)_1fr] md:items-center">
+        <div className="min-w-0 border-b border-paper/10 pb-2 md:border-b-0 md:border-r md:pb-0 md:pr-3">
+          <div className="font-mono text-[0.65rem] font-black uppercase tracking-[0.22em] text-steel">
+            Page {String(activeItem.page).padStart(2, '0')} / {String(totalPages).padStart(2, '0')}
+          </div>
+          <div className="mt-1 truncate text-sm font-black text-paper">{activeItem.label}</div>
+        </div>
+
+        <div className="page-nav-scroll flex gap-1.5 overflow-x-auto pb-0.5" role="list">
+          {items.map((item) => {
+            const isActive = item.id === activeItem.id;
+            return (
+              <button
+                id={`page-nav-${item.id}`}
+                key={item.id}
+                type="button"
+                aria-current={isActive ? 'page' : undefined}
+                title={item.label}
+                onClick={() => jumpToSection(item)}
+                className={`h-8 min-w-8 shrink-0 border px-2 font-mono text-xs font-black transition focus:outline-none focus:ring-2 focus:ring-field/70 ${
+                  isActive
+                    ? 'border-field/80 bg-field/28 text-white'
+                    : 'border-paper/14 bg-paper/[0.045] text-paper/58 hover:border-paper/35 hover:bg-paper/10 hover:text-paper'
+                }`}
+              >
+                {String(item.page).padStart(2, '0')}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </nav>
+  );
+}
+
 function CommandPrinciplesSection({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   return (
-    <SnapSection pageNumber={pageNumber} totalPages={totalPages} className="flex items-center px-5 py-12 sm:px-8 lg:px-12">
+    <SnapSection id="command-principles" pageNumber={pageNumber} totalPages={totalPages} className="flex items-center px-5 py-12 sm:px-8 lg:px-12">
       <div className="mx-auto max-w-[96rem]">
         <FadeIn>
           <SectionLabel icon={Workflow}>승리 원인 분석</SectionLabel>
@@ -164,6 +263,7 @@ function CommandPrinciplesSection({ pageNumber, totalPages }: { pageNumber: numb
 function ReadingRecommendationSection({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   return (
     <SnapSection
+      id="reading"
       pageNumber={pageNumber}
       totalPages={totalPages}
       className="flex items-center border-t border-paper/10 bg-[#111313] px-5 py-12 sm:px-8 lg:px-12"
@@ -229,10 +329,38 @@ function ReadingRecommendationSection({ pageNumber, totalPages }: { pageNumber: 
 export function App() {
   const fixedOpeningPages = 5;
   const totalPages = fixedOpeningPages + timeline.length + 3;
+  const pageNavItems = useMemo<PageNavItem[]>(
+    () => [
+      { id: 'intro', page: 1, label: '제목' },
+      { id: 'definition', page: 2, label: '전격전의 정의' },
+      { id: 'framework', page: 3, label: '전략·작전술·전술' },
+      { id: 'cannae-sichelschnitt', page: 4, label: '칸나이와 지헬슈니트' },
+      { id: 'operation-start', page: 5, label: '제1기갑사단 기동 시작' },
+      ...timeline.map((event, index) => ({
+        id: `event-${event.id}`,
+        page: fixedOpeningPages + index + 1,
+        label: event.title,
+      })),
+      {
+        id: 'command-principles',
+        page: fixedOpeningPages + timeline.length + 1,
+        label: '임무형 지휘와 명령형 전술',
+      },
+      {
+        id: 'outcome',
+        page: fixedOpeningPages + timeline.length + 2,
+        label: '돌파 이후의 결과',
+      },
+      { id: 'reading', page: totalPages, label: '추천 독서' },
+    ],
+    [fixedOpeningPages, totalPages],
+  );
 
   return (
     <main className="bg-coal text-paper">
-      <SnapSection pageNumber={1} totalPages={totalPages} className="flex items-center overflow-hidden px-5 py-10 sm:px-8 lg:px-12">
+      <PageNav items={pageNavItems} totalPages={totalPages} />
+
+      <SnapSection id="intro" pageNumber={1} totalPages={totalPages} className="flex items-center overflow-hidden px-5 py-10 sm:px-8 lg:px-12">
         <div className="absolute inset-0">
           <img src="/content/Sichelschnitt.jpg" alt="" className="h-full w-full object-cover opacity-35 grayscale" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(214,200,170,0.18),transparent_32%),linear-gradient(90deg,rgba(16,17,17,0.96),rgba(16,17,17,0.72),rgba(16,17,17,0.9))]" />
@@ -249,7 +377,7 @@ export function App() {
         </div>
       </SnapSection>
 
-      <SnapSection pageNumber={2} totalPages={totalPages} className="flex items-center border-b border-paper/10 bg-paper/[0.035] px-5 py-12 sm:px-8 lg:px-12">
+      <SnapSection id="definition" pageNumber={2} totalPages={totalPages} className="flex items-center border-b border-paper/10 bg-paper/[0.035] px-5 py-12 sm:px-8 lg:px-12">
         <div className="mx-auto grid w-full max-w-[96rem] gap-6">
           <FadeIn>
             <SectionLabel icon={Radio}>배경과 용어</SectionLabel>
@@ -271,7 +399,7 @@ export function App() {
         </div>
       </SnapSection>
 
-      <SnapSection pageNumber={3} totalPages={totalPages} className="flex items-center px-5 py-12 sm:px-8 lg:px-12">
+      <SnapSection id="framework" pageNumber={3} totalPages={totalPages} className="flex items-center px-5 py-12 sm:px-8 lg:px-12">
         <div className="mx-auto grid w-full max-w-[96rem] gap-8">
           <FadeIn className="overflow-hidden border border-paper/12 bg-black/25">
             <div className="border-b border-paper/10 px-5 py-4 sm:px-6">
@@ -341,7 +469,7 @@ export function App() {
         </div>
       </SnapSection>
 
-      <SnapSection pageNumber={4} totalPages={totalPages} className="flex items-center px-4 py-8 sm:px-6 lg:px-8 xl:px-10">
+      <SnapSection id="cannae-sichelschnitt" pageNumber={4} totalPages={totalPages} className="flex items-center px-4 py-8 sm:px-6 lg:px-8 xl:px-10">
         <div className="mx-auto grid w-full max-w-[116rem] gap-4">
           <FadeIn className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end">
             <div>
@@ -383,7 +511,7 @@ export function App() {
         </div>
       </SnapSection>
 
-      <SnapSection pageNumber={5} totalPages={totalPages} className="flex items-center px-4 py-8 sm:px-6 lg:px-8 xl:px-10">
+      <SnapSection id="operation-start" pageNumber={5} totalPages={totalPages} className="flex items-center px-4 py-8 sm:px-6 lg:px-8 xl:px-10">
         <div className="mx-auto grid w-full max-w-[116rem] gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
           <FadeIn className="order-2 flex items-center justify-center lg:order-1">
             <img
@@ -457,6 +585,7 @@ export function App() {
         return (
           <SnapSection
             key={event.id}
+            id={`event-${event.id}`}
             pageNumber={fixedOpeningPages + index + 1}
             totalPages={totalPages}
             className={`flex items-center ${sectionPadding}`}
@@ -600,6 +729,7 @@ export function App() {
       <CommandPrinciplesSection pageNumber={fixedOpeningPages + timeline.length + 1} totalPages={totalPages} />
 
       <SnapSection
+        id="outcome"
         pageNumber={fixedOpeningPages + timeline.length + 2}
         totalPages={totalPages}
         className="flex items-center border-t border-paper/10 bg-coal px-5 py-12 sm:px-8 lg:px-12"

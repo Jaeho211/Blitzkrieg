@@ -38,6 +38,23 @@ img {
   background-size: 44px 44px;
 }
 
+.page-nav-scroll {
+  scrollbar-color: rgba(214, 200, 170, 0.32) transparent;
+  scrollbar-width: thin;
+}
+
+.page-nav-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+
+.page-nav-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.page-nav-scroll::-webkit-scrollbar-thumb {
+  background: rgba(214, 200, 170, 0.28);
+}
+
 @media (max-width: 767px) {
   html {
     scroll-snap-type: y proximity;
