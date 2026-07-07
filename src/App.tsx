@@ -1,5 +1,17 @@
 import { motion } from 'framer-motion';
-import { AlertTriangle, ArrowRight, Clock3, Map, Radio, Route, Shield, Workflow, type LucideIcon } from 'lucide-react';
+import {
+  AlertTriangle,
+  ArrowRight,
+  BookOpen,
+  Clock3,
+  ExternalLink,
+  Map,
+  Radio,
+  Route,
+  Shield,
+  Workflow,
+  type LucideIcon,
+} from 'lucide-react';
 import {
   blitzkriegDefinition,
   commandComparison,
@@ -8,8 +20,10 @@ import {
   operationalArtBrief,
   operationalFrame,
   operationStart,
+  outcomeFrame,
+  outcomeTimeline,
   outcomes,
-  takeaways,
+  readingRecommendation,
   thesis,
   timeline,
   type EventKind,
@@ -77,9 +91,144 @@ function SnapSection({
   );
 }
 
+function CommandPrinciplesSection({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
+  return (
+    <SnapSection pageNumber={pageNumber} totalPages={totalPages} className="flex items-center px-5 py-12 sm:px-8 lg:px-12">
+      <div className="mx-auto max-w-[96rem]">
+        <FadeIn>
+          <SectionLabel icon={Workflow}>승리 원인 분석</SectionLabel>
+          <h2 className="max-w-5xl text-3xl font-black text-white sm:text-5xl">
+            임무형 지휘 vs 명령형 전술
+          </h2>
+          <p className="mt-6 text-lg leading-8 text-paper/75 lg:whitespace-nowrap">
+            {commandFrame.body}
+          </p>
+        </FadeIn>
+
+        <div className="mt-10 grid gap-4 lg:grid-cols-2">
+          {commandComparison.map((side, sideIndex) => (
+            <FadeIn
+              key={side.force}
+              className={`border p-5 sm:p-6 ${
+                sideIndex === 0 ? 'border-sky-700/55 bg-sky-950/25' : 'border-signal/50 bg-signal/10'
+              }`}
+            >
+              <div className="flex flex-wrap items-start justify-between gap-3 border-b border-paper/12 pb-5">
+                <div>
+                  <div className={`font-mono text-xs uppercase tracking-[0.22em] ${sideIndex === 0 ? 'text-sky-300/75' : 'text-signal'}`}>
+                    {side.mode}
+                  </div>
+                  <h3 className="mt-3 text-2xl font-black text-white sm:text-3xl">{side.force}</h3>
+                </div>
+                <div
+                  className={`border px-2 py-1 text-xs font-bold uppercase tracking-[0.18em] ${
+                    sideIndex === 0 ? 'border-sky-500/35 text-sky-200/80' : 'border-signal/45 text-signal'
+                  }`}
+                >
+                  지휘 원칙
+                </div>
+              </div>
+              <p className="mt-5 text-xl font-black leading-8 text-white">{side.title}</p>
+              <p className="mt-3 leading-7 text-paper/70">{side.summary}</p>
+
+              <div className="mt-6 grid gap-3">
+                {side.principles.map((principle) => (
+                  <div key={principle.label} className="grid gap-2 border-t border-paper/10 pt-3 sm:grid-cols-[8.5rem_1fr]">
+                    <div
+                      className={`font-mono text-xs font-bold uppercase tracking-[0.16em] ${
+                        sideIndex === 0 ? 'text-sky-300/75' : 'text-signal'
+                      }`}
+                    >
+                      {principle.label}
+                    </div>
+                    <p className="leading-7 text-paper/76">{principle.body}</p>
+                  </div>
+                ))}
+              </div>
+            </FadeIn>
+          ))}
+        </div>
+
+        <FadeIn className="mt-8 grid gap-4 border border-paper/12 bg-paper/[0.045] p-5 md:grid-cols-[auto_1fr] md:items-start">
+          <Workflow className="mt-1 text-field" size={24} />
+          <div>
+            <div className="font-mono text-xs uppercase tracking-[0.22em] text-field">Interpretation</div>
+            <p className="mt-3 text-lg font-semibold leading-8 text-paper/82">{commandFrame.note}</p>
+          </div>
+        </FadeIn>
+      </div>
+    </SnapSection>
+  );
+}
+
+function ReadingRecommendationSection({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
+  return (
+    <SnapSection
+      pageNumber={pageNumber}
+      totalPages={totalPages}
+      className="flex items-center border-t border-paper/10 bg-[#111313] px-5 py-12 sm:px-8 lg:px-12"
+    >
+      <div className="mx-auto grid w-full max-w-[96rem] gap-8 lg:grid-cols-[0.86fr_1.14fr] lg:items-center">
+        <FadeIn className="flex justify-center lg:justify-start">
+          <div className="grid w-full max-w-[28rem] gap-4">
+            <div className="border border-paper/12 bg-black/28 p-4">
+              <img
+                src={readingRecommendation.book.image}
+                alt={`${readingRecommendation.book.title} 표지`}
+                className="mx-auto max-h-[58svh] w-auto max-w-full border border-white/18 object-contain"
+              />
+            </div>
+            <a
+              href={readingRecommendation.book.url}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center justify-center gap-2 border border-field/55 bg-field/12 px-4 py-3 text-sm font-black text-paper transition hover:bg-field/20"
+            >
+              알라딘에서 보기
+              <ExternalLink size={16} />
+            </a>
+          </div>
+        </FadeIn>
+
+        <FadeIn>
+          <SectionLabel icon={BookOpen}>{readingRecommendation.kicker}</SectionLabel>
+          <div className="font-mono text-sm font-black uppercase tracking-[0.22em] text-steel">
+            Further reading
+          </div>
+          <h2 className="mt-4 max-w-5xl text-3xl font-black leading-tight text-white sm:text-5xl">
+            {readingRecommendation.title}
+          </h2>
+
+          <div className="mt-7 border border-paper/12 bg-paper/[0.045] p-5 sm:p-6">
+            <div className="flex flex-wrap items-baseline gap-x-4 gap-y-2 border-b border-paper/10 pb-5">
+              <h3 className="text-3xl font-black text-white sm:text-4xl">{readingRecommendation.book.title}</h3>
+              <div className="text-lg font-semibold text-paper/68">{readingRecommendation.book.author}</div>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 font-mono text-xs font-bold uppercase tracking-[0.16em] text-steel">
+              <span>{readingRecommendation.book.translator}</span>
+              <span>{readingRecommendation.book.publisher}</span>
+              <span>{readingRecommendation.book.published}</span>
+            </div>
+            <p className="mt-5 text-xl font-semibold leading-8 text-paper/82">{readingRecommendation.reason}</p>
+          </div>
+
+          <div className="mt-5 grid gap-3">
+            {readingRecommendation.points.map((point) => (
+              <div key={point.label} className="grid gap-3 border border-paper/12 bg-black/18 p-4 sm:grid-cols-[8rem_1fr] sm:p-5">
+                <div className="font-mono text-xs font-black uppercase tracking-[0.18em] text-field">{point.label}</div>
+                <p className="font-semibold leading-7 text-paper/74">{point.body}</p>
+              </div>
+            ))}
+          </div>
+        </FadeIn>
+      </div>
+    </SnapSection>
+  );
+}
+
 export function App() {
-  const fixedOpeningPages = 6;
-  const totalPages = fixedOpeningPages + timeline.length + 1;
+  const fixedOpeningPages = 5;
+  const totalPages = fixedOpeningPages + timeline.length + 3;
 
   return (
     <main className="bg-coal text-paper">
@@ -192,73 +341,7 @@ export function App() {
         </div>
       </SnapSection>
 
-      <SnapSection pageNumber={4} totalPages={totalPages} className="flex items-center px-5 py-12 sm:px-8 lg:px-12">
-        <div className="mx-auto max-w-[96rem]">
-          <FadeIn>
-            <SectionLabel icon={Workflow}>인상 깊었던 부분</SectionLabel>
-            <h2 className="max-w-5xl text-3xl font-black text-white sm:text-5xl">
-              핵심은 독일군과 연합군의 지휘 원칙 차이였다
-            </h2>
-            <p className="mt-6 max-w-4xl text-lg leading-8 text-paper/75">
-              {commandFrame.body}
-            </p>
-          </FadeIn>
-
-          <div className="mt-10 grid gap-4 lg:grid-cols-2">
-            {commandComparison.map((side, sideIndex) => (
-              <FadeIn
-                key={side.force}
-                className={`border p-5 sm:p-6 ${
-                  sideIndex === 0 ? 'border-sky-700/55 bg-sky-950/25' : 'border-signal/50 bg-signal/10'
-                }`}
-              >
-                <div className="flex flex-wrap items-start justify-between gap-3 border-b border-paper/12 pb-5">
-                  <div>
-                    <div className={`font-mono text-xs uppercase tracking-[0.22em] ${sideIndex === 0 ? 'text-sky-300/75' : 'text-signal'}`}>
-                      {side.mode}
-                    </div>
-                    <h3 className="mt-3 text-2xl font-black text-white sm:text-3xl">{side.force}</h3>
-                  </div>
-                  <div
-                    className={`border px-2 py-1 text-xs font-bold uppercase tracking-[0.18em] ${
-                      sideIndex === 0 ? 'border-sky-500/35 text-sky-200/80' : 'border-signal/45 text-signal'
-                    }`}
-                  >
-                    지휘 원칙
-                  </div>
-                </div>
-                <p className="mt-5 text-xl font-black leading-8 text-white">{side.title}</p>
-                <p className="mt-3 leading-7 text-paper/70">{side.summary}</p>
-
-                <div className="mt-6 grid gap-3">
-                  {side.principles.map((principle) => (
-                    <div key={principle.label} className="grid gap-2 border-t border-paper/10 pt-3 sm:grid-cols-[8.5rem_1fr]">
-                      <div
-                        className={`font-mono text-xs font-bold uppercase tracking-[0.16em] ${
-                          sideIndex === 0 ? 'text-sky-300/75' : 'text-signal'
-                        }`}
-                      >
-                        {principle.label}
-                      </div>
-                      <p className="leading-7 text-paper/76">{principle.body}</p>
-                    </div>
-                  ))}
-                </div>
-              </FadeIn>
-            ))}
-          </div>
-
-          <FadeIn className="mt-8 grid gap-4 border border-paper/12 bg-paper/[0.045] p-5 md:grid-cols-[auto_1fr] md:items-start">
-            <Workflow className="mt-1 text-field" size={24} />
-            <div>
-              <div className="font-mono text-xs uppercase tracking-[0.22em] text-field">Interpretation</div>
-              <p className="mt-3 text-lg font-semibold leading-8 text-paper/82">{commandFrame.note}</p>
-            </div>
-          </FadeIn>
-        </div>
-      </SnapSection>
-
-      <SnapSection pageNumber={5} totalPages={totalPages} className="flex items-center px-4 py-8 sm:px-6 lg:px-8 xl:px-10">
+      <SnapSection pageNumber={4} totalPages={totalPages} className="flex items-center px-4 py-8 sm:px-6 lg:px-8 xl:px-10">
         <div className="mx-auto grid w-full max-w-[116rem] gap-4">
           <FadeIn className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end">
             <div>
@@ -300,7 +383,7 @@ export function App() {
         </div>
       </SnapSection>
 
-      <SnapSection pageNumber={6} totalPages={totalPages} className="flex items-center px-4 py-8 sm:px-6 lg:px-8 xl:px-10">
+      <SnapSection pageNumber={5} totalPages={totalPages} className="flex items-center px-4 py-8 sm:px-6 lg:px-8 xl:px-10">
         <div className="mx-auto grid w-full max-w-[116rem] gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
           <FadeIn className="order-2 flex items-center justify-center lg:order-1">
             <img
@@ -340,6 +423,7 @@ export function App() {
         const style = kindStyles[event.kind];
         const sequence = event.sequence;
         const isMouzaive = event.id === 'mouzaive';
+        const isLargeMapEvent = ['mouzaive', 'sedan-misread', 'sedan-crossing', 'laubert'].includes(event.id);
         const isGhostTanks = event.id === 'ghost-tanks';
         const isDenseTextEvent = event.id === 'bulson';
         const hasVideo = Boolean(event.youtubeId);
@@ -347,21 +431,29 @@ export function App() {
         const imageGridColumns = hasVideo
           ? 'lg:grid-cols-[minmax(0,1.08fr)_minmax(26rem,0.92fr)]'
           : isGhostTanks
-            ? 'lg:grid-cols-[minmax(0,1.08fr)_minmax(30rem,0.92fr)]'
+            ? 'lg:grid-cols-[minmax(0,1fr)_minmax(28rem,1fr)]'
+          : isLargeMapEvent
+            ? 'lg:grid-cols-[minmax(0,1.35fr)_minmax(32rem,0.65fr)]'
           : isMouzaive
-          ? 'lg:grid-cols-[1.08fr_0.92fr]'
+          ? 'lg:grid-cols-[minmax(0,1fr)_minmax(28rem,1fr)]'
           : isMapEvent
-            ? 'lg:grid-cols-[minmax(0,1.18fr)_minmax(30rem,0.82fr)]'
+            ? 'lg:grid-cols-[minmax(0,1fr)_minmax(28rem,1fr)]'
             : sequence || event.analysisBlocks
               ? 'lg:grid-cols-[0.72fr_1.28fr]'
               : 'lg:grid-cols-[1.25fr_0.75fr]';
         const imageSizeClass = isGhostTanks
           ? 'h-[66svh] min-h-[360px] w-auto max-w-full sm:h-[74svh] lg:h-[94svh]'
-          : `max-h-[56svh] min-h-[280px] max-w-full ${isMouzaive ? 'lg:max-h-[92svh]' : isMapEvent ? 'lg:max-h-[94svh]' : 'lg:max-h-[74svh]'}`;
-        const layoutGap = isMapEvent ? 'gap-4 xl:gap-5' : 'gap-6';
-        const containerMaxWidth = isMapEvent || hasVideo ? 'max-w-none' : 'max-w-[116rem]';
-        const imageAlignment = isMapEvent ? 'lg:justify-end' : 'lg:justify-center';
-        const sectionPadding = isMapEvent || hasVideo ? 'px-3 py-3 sm:px-4 sm:py-4 lg:px-5 xl:px-6' : 'px-4 py-8 sm:px-6 lg:px-8 xl:px-10';
+          : isLargeMapEvent
+            ? 'max-h-[72svh] w-auto max-w-full sm:max-h-[88svh] lg:max-h-[calc(100svh-4px)]'
+            : `max-h-[56svh] min-h-[280px] max-w-full ${isMouzaive ? 'lg:max-h-[92svh]' : isMapEvent ? 'lg:max-h-[94svh]' : 'lg:max-h-[74svh]'}`;
+        const layoutGap = isLargeMapEvent ? 'gap-3 xl:gap-4' : isMapEvent ? 'gap-4 xl:gap-5' : 'gap-6';
+        const containerMaxWidth = hasVideo || isLargeMapEvent ? 'max-w-none' : 'max-w-[116rem]';
+        const imageAlignment = 'lg:justify-center';
+        const sectionPadding = hasVideo
+          ? 'px-3 py-3 sm:px-4 sm:py-4 lg:px-5 xl:px-6'
+          : isLargeMapEvent
+            ? 'px-1 py-0 sm:px-2 lg:px-3 xl:px-4'
+            : 'px-4 py-8 sm:px-6 lg:px-8 xl:px-10';
         return (
           <SnapSection
             key={event.id}
@@ -505,38 +597,62 @@ export function App() {
         );
       })}
 
+      <CommandPrinciplesSection pageNumber={fixedOpeningPages + timeline.length + 1} totalPages={totalPages} />
+
       <SnapSection
-        pageNumber={totalPages}
+        pageNumber={fixedOpeningPages + timeline.length + 2}
         totalPages={totalPages}
-        pageTone="light"
-        className="flex items-center bg-paper px-5 py-12 text-coal sm:px-8 lg:px-12"
+        className="flex items-center border-t border-paper/10 bg-coal px-5 py-12 sm:px-8 lg:px-12"
       >
-        <div className="mx-auto grid max-w-[96rem] gap-10 lg:grid-cols-[0.9fr_1.1fr]">
-          <FadeIn>
-            <SectionLabel icon={Radio}>감상 정리</SectionLabel>
-            <h2 className="text-3xl font-black sm:text-5xl">읽고 나서 남은 생각</h2>
-            <p className="mt-6 leading-8 text-coal/75">
-              전쟁사를 교훈처럼 단순화하기보다, 조직이 정보를 해석하고 실행 속도를 만드는 방식을 생각해보는 글로 마무리한다.
+        <div className="mx-auto grid w-full max-w-[96rem] gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:items-center">
+          <FadeIn className="min-w-0">
+            <SectionLabel icon={Radio}>{outcomeFrame.kicker}</SectionLabel>
+            <h2 className="max-w-4xl text-3xl font-black text-white sm:text-5xl">{outcomeFrame.title}</h2>
+            <p className="mt-6 max-w-3xl text-lg leading-8 text-paper/74">
+              {outcomeFrame.body}
             </p>
-            <div className="mt-8 grid grid-cols-3 border border-coal/15 bg-white/35">
-              {outcomes.map((item) => (
-                <div key={item.label} className="border-r border-coal/15 p-4 last:border-r-0">
-                  <div className="text-2xl font-black">{item.value}</div>
-                  <div className="mt-1 text-xs text-coal/60">{item.label}</div>
-                </div>
-              ))}
+
+            <div className="mt-8 border border-paper/12 bg-paper/[0.035] p-4 sm:p-5">
+              <ol className="list-none space-y-3 pl-0">
+                {outcomeTimeline.map((item, index) => (
+                  <li key={item.date} className="grid list-none grid-cols-[7.5rem_1fr] gap-4 sm:grid-cols-[9rem_1fr]">
+                    <div className="pt-4 text-right font-mono text-sm font-black text-steel sm:text-base">
+                      {item.date}
+                    </div>
+                    <div className="relative border border-paper/12 bg-black/18 p-4">
+                      {index < outcomeTimeline.length - 1 ? (
+                        <div className="absolute -left-[0.78rem] top-9 h-[calc(100%+0.75rem)] w-px bg-paper/14" aria-hidden="true" />
+                      ) : null}
+                      <h3 className="text-lg font-black leading-7 text-white">{item.title}</h3>
+                      <p className="mt-2 text-sm font-semibold leading-6 text-paper/72 sm:text-base sm:leading-7">{item.body}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
             </div>
           </FadeIn>
-          <div className="grid gap-3">
-            {takeaways.map((item) => (
-              <FadeIn key={item} className="flex gap-4 border border-coal/15 bg-white/35 p-5">
-                <ArrowRight className="mt-1 shrink-0 text-signal" size={20} />
-                <p className="text-lg font-semibold leading-8">{item}</p>
+
+          <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+            <FadeIn className="sm:col-span-3 lg:col-span-1">
+              <div className="font-mono text-xs font-black uppercase tracking-[0.22em] text-field">{outcomeFrame.note}</div>
+            </FadeIn>
+            {outcomes.map((item, index) => (
+              <FadeIn key={item.label} className="border border-paper/12 bg-paper/[0.045] p-5 sm:p-6">
+                <div className="flex items-center justify-between gap-4 border-b border-paper/10 pb-4">
+                  <div className="font-mono text-xs font-bold uppercase tracking-[0.18em] text-field">
+                    Result {String(index + 1).padStart(2, '0')}
+                  </div>
+                  <div className="h-1.5 w-10 bg-field/75" aria-hidden="true" />
+                </div>
+                <div className="mt-6 text-4xl font-black text-white sm:text-5xl">{item.value}</div>
+                <div className="mt-3 text-base font-semibold leading-7 text-paper/66">{item.label}</div>
               </FadeIn>
             ))}
           </div>
         </div>
       </SnapSection>
+
+      <ReadingRecommendationSection pageNumber={totalPages} totalPages={totalPages} />
 
       <footer className="snap-end border-t border-paper/10 px-5 py-8 text-sm text-paper/50 sm:px-8 lg:px-12">
         <div className="mx-auto flex max-w-[96rem] items-center gap-2">

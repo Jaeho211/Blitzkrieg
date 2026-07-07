@@ -6,7 +6,7 @@ This repository builds a local web presentation about *전격전의 전설*.
 
 ## Source of Truth
 
-- Use `content/source.md` as the only content source.
+- Use `content/source.md` as the content source.
 - Images referenced by `content/source.md` live in `content/`.
 - If content needs to be corrected or restructured, preserve the original meaning and prefer adding derived presentation data rather than rewriting the source file.
 
